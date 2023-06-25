@@ -1,16 +1,16 @@
-//переменные элементов
+// переменные элементов
 const nameInput = document.querySelector('#name-input')
 const commentInput = document.querySelector('#comment-input')
 const addButton = document.querySelector('#add-button')
 const commentsBox = document.querySelector('#comments-box')
 const delButton = document.querySelector('#delete-button')
 
-//переменные для даты
+// переменные для даты
 const date = new Date()
 const optionsForDate = {month: 'numeric', day: 'numeric'}
 const currentDate = `${date.toLocaleDateString('ru-RU', optionsForDate)}.${String(date.getFullYear()).slice(2)} ${fullTime(date.getHours())}:${fullTime(date.getMinutes())}`
 
-//переводим список комментариев в массив
+// переводим список комментариев в массив
 const commentsList = [
     {
         userName: 'Глеб Фокин',
@@ -31,7 +31,7 @@ const commentsList = [
 ]
 
 
-//рендер массива в HTML
+// рендер массива в HTML
 const renderCommentList = () => {
     const commentsHtml = commentsList.map((comments, index) => {
          return `<li class="comment">
@@ -60,7 +60,7 @@ const renderCommentList = () => {
 }
 
 
-//функция добавления лайка
+// функция добавления лайка
 const initLikeButtonsListeners = () => {
     const likeButtons = document.querySelectorAll('.like-button')
     likeButtons.forEach((likeButton, index) => {
@@ -81,7 +81,7 @@ const initLikeButtonsListeners = () => {
 }
 
 
-//рендер списка комментариев
+// рендер списка комментариев
 renderCommentList();
 
 
