@@ -4,6 +4,7 @@ const commentInput = document.querySelector('#comment-input')
 const addButton = document.querySelector('#add-button')
 const commentsBox = document.querySelector('#comments-box')
 const delButton = document.querySelector('#delete-button')
+
 //переменные для даты
 const date = new Date()
 const optionsForDate = {month: 'numeric', day: 'numeric'}
