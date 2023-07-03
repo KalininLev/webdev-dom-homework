@@ -10,7 +10,7 @@ body {
     align-items: center;
     padding-top: 80px;
     padding-bottom: 200px;
-    background: #202020;
+    background: #171717;
     min-height: 100vh;
   }
 
@@ -167,4 +167,10 @@ body {
   .quote {
     background-color: #7334ea;
     font-size: 28px;
+    padding-left: 10px;
+    padding-top: 5px;
+  }
+
+  .loading_hidden {
+    display: none;
   }
