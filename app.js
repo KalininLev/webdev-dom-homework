@@ -67,14 +67,18 @@ const renderCommentList = () => {
 
 // Функция создания ответа на комментарий
 const initCommentAnswerListeners = () => {
-    const commentAnswer = document.querySelectorAll(".comment-text")
+    const commentAnswer = document.querySelectorAll(".comment")
     commentAnswer.forEach((answer, index) => {
-        answer.addEventListener('click', () => {
-           if(answer.children.length == 0) {
+        answer.addEventListener('click', (event) => {
+           if(event.target.classList.value == 'comment-edit') {
+            return;
+           }
+           else {
             commentInput.value = `→${commentsList[index].userName}
+
 ${commentsList[index].commentText}←
-            
-`
+                        
+            `
            }
         })
     })
@@ -85,7 +89,8 @@ ${commentsList[index].commentText}←
 const initLikeButtonsListeners = () => {
     const likeButtons = document.querySelectorAll('.like-button')
     likeButtons.forEach((likeButton, index) => {
-        likeButton.addEventListener('click', () => {
+        likeButton.addEventListener('click', (event) => {
+            event.stopPropagation();
             if (commentsList[index].isLike === false ) {
                 commentsList[index].isLike = true;
                 commentsList[index].likeCounter += 1
@@ -104,8 +109,9 @@ const initLikeButtonsListeners = () => {
 const initEditButtonsListeners = () => {
     const editButtons = document.querySelectorAll('#edit-button')
     editButtons.forEach((editButton, index) => {
-        editButton.addEventListener('click', () => {
+        editButton.addEventListener('click', (event) => {
             const editCommentText = document.querySelector('.comment-edit')
+            event.stopPropagation();
            if (commentsList[index].isEdit) {           
             if (!editCommentText.value == '') {
                 commentsList[index].isEdit = false
