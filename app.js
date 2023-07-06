@@ -4,34 +4,59 @@ const commentInput = document.querySelector('#comment-input')
 const addButton = document.querySelector('#add-button')
 const commentsBox = document.querySelector('#comments-box')
 const removeButton = document.querySelector('#delete-button')
-const loading = document.querySelector('.loading')
+const loadingPage = document.querySelector('#loading_page')
+const loadingComment = document.querySelector('#loading_comment')
+const addForm = document.querySelector('.add-form')
 
 
 let isLoading = false;
+let isLoadingPage = true;
 
-function enableLoading(boolean){
+//Функция включения/отключения анимации загрузки комментария
+function enableLoadingToComment(boolean){
     if(boolean){
-        loading.classList.remove('loading_hidden')
+        loadingComment.classList.remove('loading_hidden')
+        addForm.classList.add('loading_hidden')
+
     } else {
-        loading.classList.add('loading_hidden')
+        loadingComment.classList.add('loading_hidden')
+        addForm.classList.remove('loading_hidden')
     }
 }
 
+//Функция включения/откоючения анимации при загрузке страницы
+function enableLoadingToPage(boolean){
+    if(boolean){
+        loadingPage.classList.remove('loading_hidden')
+
+    } else {
+        loadingPage.classList.add('loading_hidden')
+    }
+}
+
+//Функция для имитации запросов в API
+function delay(interval = 300) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, interval);
+    });
+}
 
 // переводим список комментов в массив
 let commentsList = []
 
 
-const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/lev-kalinin/comments", {
+fetchAndRenderCommentList = () => {
+    enableLoadingToPage(isLoadingPage);
+   return fetch("https://wedev-api.sky.pro/api/v1/lev-kalinin/comments", {
         method: "GET",
-    });
-
-
-    fetchPromise.then((response) => {
-        const jsonPromise = response.json();
-
-        jsonPromise.then((responseData) => {
-           const appComments = responseData.comments.map((comment) =>{
+    })
+    .then((response) => {
+        return response.json();
+    })
+    .then((responseData) => {
+        const appComments = responseData.comments.map((comment) =>{
             return {
                 userName: comment.author.name,
                 currDate: `${new Date(comment.date).toLocaleDateString('ru-RU', {month: 'numeric', day: 'numeric'})}.${String(new Date(comment.date).getFullYear()).slice(2)} ${fullTime(new Date(comment.date).getHours())}:${fullTime(new Date(comment.date).getMinutes())}`,
@@ -39,16 +64,15 @@ const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/lev-kalinin/comment
                 likeCounter: comment.likes,
                 isLike: comment.isLiked,
             }
-           });
-           
-
-           commentsList = appComments;
-           renderCommentList();
-
-
         });
-      });
+        commentsList = appComments;
+        isLoadingPage = false;
+        enableLoadingToPage(isLoadingPage);
+        renderCommentList();
+        });
+}
 
+fetchAndRenderCommentList();
 
 
 
@@ -85,7 +109,6 @@ const renderCommentList = () => {
     initLikeButtonsListeners();
     initEditButtonsListeners();
     initCommentAnswerListeners();
-    enableLoading(isLoading);
 }
 
 
@@ -114,17 +137,23 @@ const initLikeButtonsListeners = () => {
     const likeButtons = document.querySelectorAll('.like-button')
     likeButtons.forEach((likeButton, index) => {
         likeButton.addEventListener('click', (event) => {
+            likeButton.classList.add('-loading-like')
             event.stopPropagation();
-            if (commentsList[index].isLike === false ) {
-                commentsList[index].isLike = true;
-                commentsList[index].likeCounter += 1
-            } else {
-                commentsList[index].isLike = false;
-                commentsList[index].likeCounter -= 1
+            delay(2000).then(() => {
+                if (commentsList[index].isLike === false ) {
+                    commentsList[index].isLike = true;
+                    commentsList[index].likeCounter += 1
+                } else {
+                    commentsList[index].isLike = false;
+                    commentsList[index].likeCounter -= 1
+                }
                 
-            }
+                likeButton.classList.remove('-loading-like')
+                renderCommentList();
+            })
+            
 
-            renderCommentList()
+            
         })
     })
 }
@@ -153,9 +182,6 @@ const initEditButtonsListeners = () => {
     })
 }
 
-//РЕНДЕРИМ НАШ СПИСОК КОММЕНТАРИЕВ
-renderCommentList();
-
 
 //ВСЕ ОСТАЛЬНЫЕ ФУНКЦИИ НА СТАТИЧЕСКИХ ЭЛЕМЕНТАХ
 
@@ -178,13 +204,10 @@ function disableBtn() {
 
 // функция добавления нашего комментария в массив
 function addComment() {
-    //переменные для даты
-    const date = new Date();
-    const optionsForDate = {month: 'numeric', day: 'numeric'}
-    const currentDate = `${date.toLocaleDateString('ru-RU', optionsForDate)}.${String(date.getFullYear()).slice(2)} ${fullTime(date.getHours())}:${fullTime(date.getMinutes())}`;
 
-    isLoading = true
-    
+    isLoading = true;
+    enableLoadingToComment(isLoading);
+
     fetch("https://wedev-api.sky.pro/api/v1/lev-kalinin/comments", {
         method: "POST",
         body: JSON.stringify({
@@ -201,51 +224,17 @@ function addComment() {
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&gt;")
             .replaceAll('"', "&quot;"),
-        })
-    });
-
-    const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/lev-kalinin/comments", {
-        method: "GET",
-    });
-
-    fetchPromise.then((response) => {
-        const jsonPromise = response.json();
-
-        jsonPromise.then((responseData) => {
-           const appComments = responseData.comments.map((comment) =>{
-            return {
-                userName: comment.author.name,
-                currDate: `${new Date(comment.date).toLocaleDateString('ru-RU', {month: 'numeric', day: 'numeric'})}.${String(new Date(comment.date).getFullYear()).slice(2)} ${fullTime(new Date(comment.date).getHours())}:${fullTime(new Date(comment.date).getMinutes())}`,
-                commentText: comment.text,
-                likeCounter: comment.likes,
-                isLike: comment.isLiked,
-            }
-           });
-           
-           commentsList = appComments;
-           isLoading = false
-           renderCommentList();
-
-        });
-      });
+        }),
+    })
+    .then(() => {
+        return fetchAndRenderCommentList();
+    })
+    .then(() => {
+        isLoading = false
+        enableLoadingToComment(isLoading);
+    })
 
     
-    // commentsList.push({
-    //     userName: nameInput.value
-    //     .replaceAll("&", "&amp;")
-    //     .replaceAll("<", "&lt;")
-    //     .replaceAll(">", "&gt;")
-    //     .replaceAll('"', "&quot;"),
-    //     currDate: currentDate,
-    //     likeCounter: 0,
-    //     isLike: false,
-    //     commentText: commentInput.value
-    //     .replaceAll("&", "&amp;")
-    //     .replaceAll("<", "&lt;")
-    //     .replaceAll(">", "&gt;")
-    //     .replaceAll('"', "&quot;"),
-    //     isEdit: false,
-    // })
 }
 
 // Перекрашиваем поле и включаем/отлючаем кнопку в инпуте имени
