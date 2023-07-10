@@ -53,7 +53,7 @@ fetchAndRenderCommentList = () => {
         method: "GET",
     })
     .then((response) => {
-        return response.json();
+        return response.json();  
     })
     .then((responseData) => {
         const appComments = responseData.comments.map((comment) =>{
@@ -69,7 +69,15 @@ fetchAndRenderCommentList = () => {
         isLoadingPage = false;
         enableLoadingToPage(isLoadingPage);
         renderCommentList();
-        });
+    })
+    .catch((error) =>{
+        console.log(error)
+        if(navigator.onLine){
+            alert('Упс, что-то пошло не так!')            
+        } else {
+            alert('Кажется, у вас сломался интернет, попробуйте позже')
+        }
+    })
 }
 
 fetchAndRenderCommentList();
@@ -219,19 +227,47 @@ function addComment() {
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&gt;")
             .replaceAll('"', "&quot;"),
-            name:nameInput.value
+            name: nameInput.value
             .replaceAll("&", "&amp;")
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&gt;")
             .replaceAll('"', "&quot;"),
+            forceError: true
         }),
+    })
+    .then((response) =>{
+        if(response.status === 201) {
+            return response.json();
+        } else {
+            switch(response.status) {
+                case 500: throw new Error('Сервер сломался, попробуйте позже!')
+                case 400: throw new Error('Имя и комментарий должны быть НЕ КОРОЧЕ 3 символов!')
+                default: throw new Error('Упс, что-то пошло не так!')
+            }
+        }
     })
     .then(() => {
         return fetchAndRenderCommentList();
     })
     .then(() => {
+        nameInput.value = ''
+        commentInput.value = ''
         isLoading = false
         enableLoadingToComment(isLoading);
+        addButton.classList.add('add-form-button_disable')
+    })
+    .catch((error) => {
+        isLoading = false
+        enableLoadingToComment(isLoading);
+        addButton.classList.remove('add-form-button_disable')
+
+        console.log(error)
+        if(navigator.onLine){
+            handlePostClick(error);            
+        } else {
+            alert('Кажется, у вас сломался интернет, попробуйте позже')
+        }
+        
     })
 
     
@@ -265,12 +301,22 @@ commentInput.addEventListener('blur', () => {
     }
 })
 
+
+const handlePostClick = (error) => {
+    if (error.message === 'Сервер сломался, попробуйте позже!'){
+        addComment();
+    } else {
+        alert(error.message)
+    }
+  };
+
+
+
 //логика кнопки добавления комментария
 addButton.addEventListener('click', () => {
     addComment()
     renderCommentList()
-    nameInput.value = ''
-    commentInput.value = ''
+
     addButton.classList.add('add-form-button_disable')
     addButton.blur();
 })
