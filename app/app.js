@@ -20,6 +20,7 @@ export const loadingHeadBox = document.querySelector('#loading-head')
 export const inputsBox = document.querySelector('.add-form')
 export const linkRow = document.querySelector('#login-row')
 
+
 // Создаем массив для хранения списка комментариев
 export let commentsList = []
 
