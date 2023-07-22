@@ -3,21 +3,18 @@
   <head>
     <title>Проект "Комменты"</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="styles.css" />
-    <script defer type="module" src="./modules/main.js"></script>
+    <link rel="stylesheet" href="./css/styles.css" />
+    <script type="module" defer src="./app/app.js"></script>
   </head>
 
   <body>
+    
     <div class="container">
-      <div id="loading_page" class="loading loading_hidden"><img src="./loading.gif" alt="loading">
-        Комментарии загружаются...
-      </div>
+      <div id="loading-head" class="loading hidden"><img class="loading-img" width="300px" src="./img/loading-head.gif" alt="loading-bar">Комментарии загружаются</div>
       <ul id="comments-box" class="comments">
         <!-- Рендерим список из JS -->
       </ul>
-      <div id="loading_comment" class="loading loading_hidden"><img src="./loading.gif" alt="loading">
-        Комментарий добавляется...
-      </div>
+      <div id="loading-comments" class="loading hidden"><img class="loading-img" width="300px" src="./img/loading-head.gif" alt="loading-bar">Комментарий загружается</div>
       <div class="add-form">
         <input
           id="name-input"
@@ -36,6 +33,8 @@
           <button id="add-button" class="add-form-button add-form-button_disable">Написать</button>
         </div>
       </div>
+      <div id="login-row" class="login hidden">Чтобы добавить комментарий, <span>авторизуйтесь</span></div>      
     </div>
+    
   </body>
 </html>
